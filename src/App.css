@@ -10,8 +10,8 @@ body {
     box-shadow: 2px 2px 15px 0 rgba(0, 0, 0, 0.2);
 }
 
-#Home.container {
-    padding-top: 10%;
+.container {
+    padding-top: 5%;
 }
 
 #Home>.row>.col>img {
