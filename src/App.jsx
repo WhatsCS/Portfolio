@@ -1,4 +1,5 @@
 import React from "react";
+import Accordion from "react-bootstrap/Accordion";
 import Card from "react-bootstrap/Card";
 import Container from "react-bootstrap/Container";
 import Col from "react-bootstrap/Col";
@@ -40,12 +41,58 @@ function Home() {
 }
 
 class Projects extends React.Component {
-  getProjects() {}
+  constructor(props) {
+    super(props);
+    this.state = {
+      error: null,
+      isLoaded: false,
+      items: []
+    };
+    this.getProjects();
+  }
+  getProjects() {
+    fetch("https://api.github.com/users/whatscs/repos")
+      .then(res => res.json())
+      .then(
+        result => {
+          this.setState({
+            isLoaded: true,
+            items: result.items
+          });
+        },
+        error => {
+          this.setState({
+            isLoaded: true,
+            error
+          });
+        }
+      );
+    return this.state.items;
+  }
+  Accordion() {
+    const items = this.state.items.length === 0 ? this.state.items : null;
+    if (items === null) {
+      return;
+    }
+    console.log(items);
+    return (
+      <Accordion>
+        <Card>
+          <Accordion.Toggle as={Card.Header}>Test</Accordion.Toggle>
+          <Accordion.Collapse>
+            <Card.Body>Testing body right now.</Card.Body>
+          </Accordion.Collapse>
+        </Card>
+      </Accordion>
+    );
+  }
   render() {
     return (
-      <div>
-        <div></div>
-      </div>
+      <Container>
+        <Row>
+          <Col></Col>
+        </Row>
+      </Container>
     );
   }
 }
