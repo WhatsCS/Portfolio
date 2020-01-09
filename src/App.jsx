@@ -15,8 +15,8 @@ function Home() {
   return (
     <Container id="Home">
       <Row>
-        <Col>
-          <Image src="/rp.jpg" />
+        <Col id="resume">
+          <Image src="/rp.jpg" alt="resume" />
         </Col>
         <Col>
           <Card bg="light">
@@ -43,21 +43,28 @@ function Home() {
 class Projects extends React.Component {
   constructor(props) {
     super(props);
+    this.acc = this.acc.bind(this);
     this.state = {
       error: null,
       isLoaded: false,
       items: []
     };
-    this.getProjects();
   }
-  getProjects() {
+
+  componentDidMount() {
     fetch("https://api.github.com/users/whatscs/repos")
       .then(res => res.json())
       .then(
         result => {
           this.setState({
             isLoaded: true,
-            items: result.items
+            items: result.map(repo => ({
+              name: repo.name,
+              url: repo.html_url,
+              description: repo.description,
+              fork: repo.fork,
+              language: repo.language
+            }))
           });
         },
         error => {
@@ -67,7 +74,6 @@ class Projects extends React.Component {
           });
         }
       );
-    return this.state.items;
   }
   Accordion() {
     const items = this.state.items.length === 0 ? this.state.items : null;
