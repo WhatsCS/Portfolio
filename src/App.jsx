@@ -8,8 +8,17 @@ import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
 import Row from "react-bootstrap/Row";
 import { LinkContainer } from "react-router-bootstrap";
-import { HashRouter as Router, Route, Switch } from "react-router-dom";
+import { HashRouter as Router, Route } from "react-router-dom";
+import { AnimatedSwitch, spring } from "react-router-transition";
+import ProjectAccordion from "./components/accordion";
 import "./App.css";
+
+function glide(val) {
+  return spring(val, {
+    stiffness: 110,
+    damping: 29
+  });
+}
 
 function Home() {
   return (
@@ -58,12 +67,13 @@ class Projects extends React.Component {
         result => {
           this.setState({
             isLoaded: true,
-            items: result.map(repo => ({
+            items: result.map((repo, index) => ({
               name: repo.name,
               url: repo.html_url,
               description: repo.description,
               fork: repo.fork,
-              language: repo.language
+              language: repo.language === null ? null : repo.language,
+              i: index
             }))
           });
         },
@@ -75,28 +85,19 @@ class Projects extends React.Component {
         }
       );
   }
-  Accordion() {
-    const items = this.state.items.length === 0 ? this.state.items : null;
-    if (items === null) {
-      return;
-    }
-    console.log(items);
-    return (
-      <Accordion>
-        <Card>
-          <Accordion.Toggle as={Card.Header}>Test</Accordion.Toggle>
-          <Accordion.Collapse>
-            <Card.Body>Testing body right now.</Card.Body>
-          </Accordion.Collapse>
-        </Card>
-      </Accordion>
-    );
+
+  acc() {
+    var result = this.state.items.map(repo => <ProjectAccordion repo={repo} />);
+    return <Accordion defaultActiveKey="0">{result}</Accordion>;
   }
+
   render() {
     return (
       <Container>
         <Row>
-          <Col></Col>
+          <Col>
+            <this.acc />
+          </Col>
         </Row>
       </Container>
     );
@@ -124,7 +125,18 @@ function App() {
             </Nav.Item>
           </Nav>
         </Navbar>
-        <Switch>
+        <AnimatedSwitch
+          atEnter={{
+            offset: 100
+          }}
+          atLeave={{ offset: glide(-100) }}
+          atActive={{ offset: glide(0) }}
+          runOnMount={false}
+          mapStyles={styles => ({
+            transform: `translateX(${styles.offset}%)`
+          })}
+          className="switch-wrapper"
+        >
           <Route path="/Home">
             <Home />
           </Route>
@@ -134,7 +146,7 @@ function App() {
           <Route path="/">
             <Home />
           </Route>
-        </Switch>
+        </AnimatedSwitch>
       </Router>
     </div>
   );
