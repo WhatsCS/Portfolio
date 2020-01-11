@@ -2,6 +2,7 @@
   "homepage": "https://whatscs.github.io/",
   "name": "portfolio",
   "version": "0.1.0",
+  "license": "MIT",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
