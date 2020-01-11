@@ -2,6 +2,10 @@ body {
     background-color: rgb(226, 223, 223);
 }
 
+.bg-purple {
+    background-color: #5d485f;
+}
+
 #Home .card {
     box-shadow: 2px 2px 4px 0 rgba(0, 0, 0, 0.2);
 }

@@ -7,6 +7,7 @@ import Image from "react-bootstrap/Image";
 import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
 import Row from "react-bootstrap/Row";
+import Spinner from "react-bootstrap/Spinner";
 import { LinkContainer } from "react-router-bootstrap";
 import { HashRouter as Router, Route } from "react-router-dom";
 import { AnimatedSwitch, spring } from "react-router-transition";
@@ -39,7 +40,8 @@ function Home() {
                 Computer Science Major, Gamer, Linux enthusiast. Since his first
                 computer until now, Evan has been tinkering with technology.
                 Building and trouble shooting desktops, configuring and
-                maintaining servers or just writing software.
+                maintaining servers or just writing software (including this
+                website!).
               </Card.Text>
             </Card.Body>
           </Card>
@@ -54,9 +56,9 @@ class Projects extends React.Component {
     super(props);
     this.acc = this.acc.bind(this);
     this.state = {
-      error: null,
-      isLoaded: false,
-      items: []
+      repos_error: null,
+      repos_isLoaded: false,
+      repos_items: []
     };
   }
 
@@ -66,8 +68,8 @@ class Projects extends React.Component {
       .then(
         result => {
           this.setState({
-            isLoaded: true,
-            items: result.map((repo, index) => ({
+            repos_isLoaded: true,
+            repos_items: result.map((repo, index) => ({
               name: repo.name,
               url: repo.html_url,
               description: repo.description,
@@ -79,16 +81,25 @@ class Projects extends React.Component {
         },
         error => {
           this.setState({
-            isLoaded: true,
-            error
+            repos_isLoaded: true,
+            repos_error: error
           });
         }
       );
   }
 
   acc() {
-    var result = this.state.items.map(repo => <ProjectAccordion repo={repo} />);
-    return <Accordion defaultActiveKey="0">{result}</Accordion>;
+    if (this.state.repos_isLoaded) {
+      var result = this.state.repos_items.map(repo => (
+        <ProjectAccordion repo={repo} />
+      ));
+      return <Accordion defaultActiveKey="0">{result}</Accordion>;
+    }
+    return (
+      <Spinner animation="border" role="status">
+        <span className="sr-only">Loading...</span>
+      </Spinner>
+    );
   }
 
   render() {
@@ -108,7 +119,7 @@ function App() {
   return (
     <div className="App">
       <Router>
-        <Navbar variant="dark" bg="dark">
+        <Navbar variant="dark" bg="purple">
           <LinkContainer to="/">
             <Navbar.Brand className="col-sm-10">Portfolio</Navbar.Brand>
           </LinkContainer>
