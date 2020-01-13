@@ -17,7 +17,7 @@ import "./App.css";
 function glide(val) {
   return spring(val, {
     stiffness: 110,
-    damping: 29
+    damping: 29,
   });
 }
 
@@ -58,7 +58,7 @@ class Projects extends React.Component {
     this.state = {
       repos_error: null,
       repos_isLoaded: false,
-      repos_items: []
+      items: [],
     };
   }
 
@@ -138,16 +138,15 @@ function App() {
         </Navbar>
         <AnimatedSwitch
           atEnter={{
-            offset: 100
+            offset: 100,
           }}
           atLeave={{ offset: glide(-100) }}
           atActive={{ offset: glide(0) }}
           runOnMount={false}
           mapStyles={styles => ({
-            transform: `translateX(${styles.offset}%)`
+            transform: `translateX(${styles.offset}%)`,
           })}
-          className="switch-wrapper"
-        >
+          className="switch-wrapper">
           <Route path="/Home">
             <Home />
           </Route>
