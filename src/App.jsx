@@ -1,5 +1,9 @@
 import React from "react";
+import ApolloClient from "apollo-boost";
+import { ApolloProvider, useQuery } from "@apollo/react-hooks";
+import gql from "graphql-tag";
 import Accordion from "react-bootstrap/Accordion";
+import Alert from "react-bootstrap/Alert";
 import Card from "react-bootstrap/Card";
 import Container from "react-bootstrap/Container";
 import Col from "react-bootstrap/Col";
@@ -13,7 +17,13 @@ import { HashRouter as Router, Route } from "react-router-dom";
 import { AnimatedSwitch, spring } from "react-router-transition";
 import ProjectAccordion from "./components/accordion";
 import "./App.css";
+import * as dotenv from "dotenv";
 
+dotenv.config();
+
+const client = new ApolloClient({
+  uri: "https://api.github.com/graphql",
+});
 function glide(val) {
   return spring(val, {
     stiffness: 110,
@@ -117,6 +127,7 @@ class Projects extends React.Component {
 
 function App() {
   return (
+    <ApolloProvider client={client}>
     <div className="App">
       <Router>
         <Navbar variant="dark" bg="purple">
@@ -159,6 +170,7 @@ function App() {
         </AnimatedSwitch>
       </Router>
     </div>
+    </ApolloProvider>
   );
 }
 
