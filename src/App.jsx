@@ -1,6 +1,5 @@
-import React from "react";
-import ApolloClient from "apollo-boost";
-import { ApolloProvider, useQuery } from "@apollo/react-hooks";
+import React, { useState } from "react";
+import { useQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import Accordion from "react-bootstrap/Accordion";
 import Alert from "react-bootstrap/Alert";
@@ -21,9 +20,45 @@ import * as dotenv from "dotenv";
 
 dotenv.config();
 
-const client = new ApolloClient({
-  uri: "https://api.github.com/graphql",
-});
+const TEST = gql`
+  {
+    viewer {
+      node {
+        name
+      }
+    }
+  }
+`;
+
+const GET_ALL = gql`
+  {
+    viewer {
+      login
+      repositories(first: 10, privacy: PUBLIC, ownerAffiliations: OWNER) {
+        edges {
+          node {
+            name
+            description
+            url
+            languages(first: 10) {
+              edges {
+                node {
+                  name
+                }
+              }
+            }
+            object(expression: "master:README.md") {
+              ... on Blob {
+                text
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
 function glide(val) {
   return spring(val, {
     stiffness: 110,
@@ -61,73 +96,51 @@ function Home() {
   );
 }
 
-class Projects extends React.Component {
-  constructor(props) {
-    super(props);
-    this.acc = this.acc.bind(this);
-    this.state = {
-      repos_error: null,
-      repos_isLoaded: false,
-      items: [],
-    };
-  }
+function Projects() {
+  const [isLoaded, setisLoaded] = useState(false);
+  const [Rerror, setError] = useState(null);
+  const [items, setItems] = useState();
 
-  componentDidMount() {
-    fetch("https://api.github.com/users/whatscs/repos")
-      .then(res => res.json())
-      .then(
-        result => {
-          this.setState({
-            repos_isLoaded: true,
-            repos_items: result.map((repo, index) => ({
-              name: repo.name,
-              url: repo.html_url,
-              description: repo.description,
-              fork: repo.fork,
-              language: repo.language === null ? null : repo.language,
-              i: index
-            }))
-          });
-        },
-        error => {
-          this.setState({
-            repos_isLoaded: true,
-            repos_error: error
-          });
-        }
-      );
-  }
+  const { loading, error, data } = useQuery(TEST);
 
-  acc() {
-    if (this.state.repos_isLoaded) {
-      var result = this.state.repos_items.map(repo => (
-        <ProjectAccordion repo={repo} />
-      ));
-      return <Accordion defaultActiveKey="0">{result}</Accordion>;
-    }
+  if (loading)
     return (
       <Spinner animation="border" role="status">
         <span className="sr-only">Loading...</span>
       </Spinner>
     );
+  if (error) {
+    return <div>{error.message}</div>;
   }
-
-  render() {
-    return (
-      <Container>
-        <Row>
-          <Col>
-            <this.acc />
-          </Col>
-        </Row>
-      </Container>
-    );
-  }
+  console.log(data);
+  // if (this.state.repos_isLoaded && this.state.repos_error === null) {
+  //   let result = this.state.items.map(repo => <ProjectAccordion repo={repo} />);
+  //   return <Accordion defaultActiveKey="0">{result}</Accordion>;
+  // }
+  // else if (this.state.repos_isLoaded) {
+  //   return (
+  //     <Alert variant="danger">
+  //       <Alert.Heading>Error</Alert.Heading>
+  //     </Alert>
+  //   );
+  // }
+  //   return (
+  //     <Spinner animation="border" role="status">
+  //       <span className="sr-only">Loading...</span>
+  //     </Spinner>
+  //   );
+  // }
+  return (
+    <Container>
+      <Row>
+        <Col>{data}</Col>
+      </Row>
+    </Container>
+  );
 }
 
 function App() {
   return (
-    <ApolloProvider client={client}>
     <div className="App">
       <Router>
         <Navbar variant="dark" bg="purple">
@@ -170,7 +183,6 @@ function App() {
         </AnimatedSwitch>
       </Router>
     </div>
-    </ApolloProvider>
   );
 }
 
